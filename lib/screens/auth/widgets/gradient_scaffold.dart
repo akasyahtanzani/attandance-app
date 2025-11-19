@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class GradientScaffold extends StatelessWidget {
   final Widget child;
-  final IconData loginIcon;
+  final IconData logoIcon;
   final String title;
   final String subtitle;
-  const GradientScaffold({super.key, required this.child, required this.loginIcon, required this.title, required this.subtitle});
+  const GradientScaffold({super.key, required this.child, required this.logoIcon, required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,8 @@ class GradientScaffold extends StatelessWidget {
                   _buildTitle(),
                   SizedBox(height: 8,),
                   _buildSubtitle(),
-                  SizedBox(height: 48,)
+                  SizedBox(height: 48,),
+                  child
                 ],
               ),
             ),
@@ -59,7 +60,7 @@ class GradientScaffold extends StatelessWidget {
        ),
         ]
       ),
-      child: Icon(loginIcon, size: 60, color: Colors.blue[700],),
+      child: Icon(logoIcon, size: 60, color: Colors.blue[700],),
     );
   }
 

@@ -21,19 +21,21 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
 
   Future<void> _login() async {
-    if (!_formKey.currentState!.validate());
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
+    // trim supaya tidak ada spasi
     try {
       await _authService.signInWithEmailAndPassword(
         _emailController.text.trim(),
         _passwordController.text.trim()
       );
     } catch (e) {
-      if (mounted) {
+      if (mounted) { 
+        //kalo error
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('an error accured, please try again later'), backgroundColor: Colors.red,)
+          SnackBar(content: Text("an error occured, please try again later"), backgroundColor: Colors.red)
         );
       }
     } finally {
@@ -51,9 +53,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return GradientScaffold(
-      loginIcon: Icons.calendar_today_rounded,
+      logoIcon: Icons.calendar_month_rounded,
       title: 'Welcome Back',
-      subtitle: 'Login to continue',
+      subtitle: 'Login to Continue',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -73,22 +75,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       obscuretext: false,
                       icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
-                      validator: (value) => value?.isEmpty ?? true ? 'Please enter your email ' : null,
+                      validator: (value) => value?.isEmpty ?? true ? 'Please enter your email' : null,
                     ),
                     SizedBox(height: 16),
                     AuthTextField(
                       controller: _passwordController,
                       label: 'Password',
-                      icon: Icons.lock_outline,
-                      obscuretext: true,
+                      icon:  Icons.lock_outline,
+                      obscuretext: _obscurePassword,
+                      // untuk visibility password
                       suffixicon: IconButton(
                         icon: Icon(
                           _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                           color: Colors.blue[600],
                         ),
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword ),
                       ),
-                      validator: (value) => value?.isEmpty ?? true ? 'please enter your password' : null,
+                      validator: (value) => value?.isEmpty ?? true ? 'Please enter password' : null,
                     ),
                     SizedBox(height: 24),
                     ElevatedButton(
@@ -101,26 +104,26 @@ class _LoginScreenState extends State<LoginScreen> {
                         elevation: 4
                       ),
                       child: _isLoading
-                         ? SizedBox(
+                          ? SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(color:Colors.white, strokeWidth: 2),
-                         )
-                         : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.login_rounded, size: 20),
-                            SizedBox(width: 8),
-                            Text(
-                              'Login',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold
-                              ),
-                            )
-                          ],
-                         )
-                    )
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          )
+                          : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.login_rounded, size: 20,),
+                              SizedBox(width: 8),
+                              Text(
+                                'Login',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold
+                                ),
+                              )
+                            ],
+                          )
+                    ),
                   ],
                 ),
               ),
@@ -130,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
           TextButton(
             onPressed: widget.onRegisterTap,
             style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
+              foregroundColor: Colors.white
             ),
             child: Text(
               "Don't have an account? Register"
@@ -138,7 +141,6 @@ class _LoginScreenState extends State<LoginScreen> {
           )
         ],
       ),
-
     );
   }
 }
