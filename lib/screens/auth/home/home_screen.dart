@@ -1,4 +1,7 @@
 import 'package:attandance_app/models/attendance_record.dart';
+import 'package:attandance_app/screens/auth/home/widgets/action_button.dart';
+import 'package:attandance_app/screens/auth/home/widgets/attendance_card.dart';
+import 'package:attandance_app/screens/auth/home/widgets/profil_card.dart';
 import 'package:attandance_app/services/auth_services.dart';
 import 'package:attandance_app/services/firestore_service.dart';
 import 'package:attandance_app/services/storage_services.dart';
@@ -97,9 +100,8 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       String? photoKey;
       if (photoPath != null) {
-        photoKey = await _storageServices.uploadAttendancePhoto(photoPath, 'checkout');
-
-        final updateRecord = AttendanceRecord(
+        photoKey = await _storageServices.uploadAttendancePhoto(photoPath, 'checkout');}
+         final updateRecord = AttendanceRecord(
           id: _todayRecord!.id,
           userId: _todayRecord!.userId,
           chekInTime: _todayRecord!.chekInTime,
@@ -108,24 +110,92 @@ class _HomeScreenState extends State<HomeScreen> {
           chekInPhotoPath: _todayRecord!.chekInPhotoPath,
           chekOutPhotoPath: photoKey,
         );
-
         await _firestoreService.uploadAttendancePhoto(updateRecord);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(photoPath != null ? 'Checked Out successfully with photo' : 'Check Out succesfully'),
+              content: Text(photoPath != null ? 
+              'Checked Out successfully with photo' 
+              : 'Check Out succesfully'
+              ),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
             )
           );
         }
-      }
-    } catch (e) {
       
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error checking out: ${e.toString()}'
+            ),
+            backgroundColor: Colors.red,
+          )
+        );
+      }
+    } finally{
+      if(mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        title: Text('Attendance Tracker'),
+        backgroundColor: Colors.blue[700],
+        foregroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.history),
+            onPressed: () {
+              // TODO: go to history screen 
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () async=> await _authServices.signOut() ,
+          )
+        ],
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.blue[700]!,
+              Colors.grey[50]!
+            ],
+            stops: [0, 0, 0.3]
+          )
+        ),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ProfilCard(),
+              SizedBox(height: 24),
+              AttendanceCard(todayRecord: _todayRecord),
+              SizedBox(height: 24),
+              ActionButton(
+                todayRecord: _todayRecord,
+                isLoading: _isLoading,
+                onCheckIn: () => _CheckIn(),
+                onCheckOut: () =>  _checkOut(),
+                onCheckInWithPhoto: (path) => _CheckIn(photoPath: path),
+                onCheckOutWithPhoto: (path) => _checkOut(photoPath: path),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
