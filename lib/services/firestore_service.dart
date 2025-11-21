@@ -92,4 +92,6 @@ class FirestoreService {
       await updateAttendanceRecord(record);
     }
   }
+
+  Future<void> uploadAttendancePhoto(AttendanceRecord updateRecord) async {}
 }
