@@ -2,6 +2,7 @@ import 'package:attandance_app/models/attendance_record.dart';
 import 'package:attandance_app/screens/auth/home/widgets/action_button.dart';
 import 'package:attandance_app/screens/auth/home/widgets/attendance_card.dart';
 import 'package:attandance_app/screens/auth/home/widgets/profil_card.dart';
+import 'package:attandance_app/screens/history/history_screen.dart';
 import 'package:attandance_app/services/auth_services.dart';
 import 'package:attandance_app/services/firestore_service.dart';
 import 'package:attandance_app/services/storage_services.dart';
@@ -19,8 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final FirestoreService _firestoreService = FirestoreService();
   final StorageServices _storageServices = StorageServices();
   AttendanceRecord? _todayRecord;
-  bool _isLoading= false;
-
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -28,39 +28,35 @@ class _HomeScreenState extends State<HomeScreen> {
     _listenToTodayRecord();
   }
 
-  // mendengarkan semua hal yg terjadi di homescreen ->attendance record
   void _listenToTodayRecord() {
-    final user = _authServices.currentUser;
+    final 
+    user = _authServices.currentUser;
     if (user != null) {
-      _firestoreService.getTodayRecordStream(user.uid).listen((record) {
-        // masih aktif 
-        if (mounted) setState(() => _todayRecord = record);
+      _firestoreService.getTodayRecordStream(user.uid).listen((record){
+        if (mounted) setState(() => _todayRecord =  record);
       });
     }
   }
 
-  // utk check in
-  Future<void> _CheckIn({String? photoPath}) async {
+  Future<void> _checkIn({String? photoPath}) async {
     final user = _authServices.currentUser;
-    // kalo user tidak ada di database
-    if (user == null) return null;
+    if (user == null) return;
 
     setState(() => _isLoading = true);
 
-    // percobaan utk take photo ketika check in
     try {
       String? photoKey;
       if (photoPath != null) {
-        photoKey = await _storageServices.uploadAttendancePhoto(photoPath, 'CheckIn');
+        photoKey = await _storageServices.uploadAttendancePhoto(photoPath, 'checkin');
       }
 
       final now = DateTime.now();
       final record = AttendanceRecord(
         id: '',
         userId: user.uid,
-        chekInTime: now,
+        checkInTime: now,
         date: DateTime(now.year, now.month, now.day),
-        chekInPhotoPath: photoKey,
+        checkInPhotoPath: photoKey
       );
 
       await _firestoreService.createAttendanceRecord(record);
@@ -77,11 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       }
     } catch (e) {
-      // kalau tidak berhasil check in
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error checkhing in: ${e.toString()}'),
+            content: Text('Errod checking in: ${e.toString()}'),
             backgroundColor: Colors.red,
           )
         );
@@ -91,40 +86,41 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // check out
   Future<void> _checkOut({String? photoPath}) async {
     if (_todayRecord == null) return;
 
-    setState(() => _isLoading = true);
+    setState(() => _isLoading =true);
 
     try {
       String? photoKey;
       if (photoPath != null) {
         photoKey = await _storageServices.uploadAttendancePhoto(photoPath, 'checkout');}
-         final updateRecord = AttendanceRecord(
+
+        final updateRecord = AttendanceRecord(
           id: _todayRecord!.id,
           userId: _todayRecord!.userId,
-          chekInTime: _todayRecord!.chekInTime,
-          chekOutime: DateTime.now(),
+          checkInTime: _todayRecord!.checkInTime,
+          checkOutTime: DateTime.now(),
           date: _todayRecord!.date,
-          chekInPhotoPath: _todayRecord!.chekInPhotoPath,
-          chekOutPhotoPath: photoKey,
+          checkInPhotoPath: _todayRecord!.checkInPhotoPath,
+          checkOutPhotoPath: photoKey
         );
-        await _firestoreService.uploadAttendancePhoto(updateRecord);
+
+        await _firestoreService.updateAttendanceRecord(updateRecord);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(photoPath != null ? 
-              'Checked Out successfully with photo' 
-              : 'Check Out succesfully'
+              content: Text(
+                photoPath != null 
+                ? 'Checked out successfully with photo' 
+                : 'Checked out successfully'
               ),
               backgroundColor: Colors.green,
               duration: Duration(seconds: 2),
             )
           );
         }
-      
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -136,8 +132,10 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         );
       }
-    } finally{
-      if(mounted) setState(() => _isLoading = false);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -153,13 +151,13 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.history),
-            onPressed: () {
-              // TODO: go to history screen 
-            },
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => HistoryScreen())
+            )
           ),
           IconButton(
             icon: Icon(Icons.logout),
-            onPressed: () async=> await _authServices.signOut() ,
+            onPressed: () async => await _authServices.signOut(),
           )
         ],
       ),
@@ -172,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Colors.blue[700]!,
               Colors.grey[50]!
             ],
-            stops: [0, 0, 0.3]
+            stops: [0.0, 0.3]
           )
         ),
         child: SingleChildScrollView(
@@ -187,9 +185,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ActionButton(
                 todayRecord: _todayRecord,
                 isLoading: _isLoading,
-                onCheckIn: () => _CheckIn(),
-                onCheckOut: () =>  _checkOut(),
-                onCheckInWithPhoto: (path) => _CheckIn(photoPath: path),
+                onCheckIn: () => _checkIn(),
+                onCheckOut: () => _checkOut(),
+                onCheckInWithPhoto: (path) => _checkIn(photoPath: path),
                 onCheckOutWithPhoto: (path) => _checkOut(photoPath: path),
               )
             ],

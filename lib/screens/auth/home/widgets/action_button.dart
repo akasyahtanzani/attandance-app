@@ -18,7 +18,7 @@ class ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasCheckedIn = todayRecord != null;
-    final hasCheckedOut = todayRecord?.chekOutime != null;
+    final hasCheckedOut = todayRecord?.checkOutTime != null;
 
     if (hasCheckedOut) {
       return _buildCompletedCard();

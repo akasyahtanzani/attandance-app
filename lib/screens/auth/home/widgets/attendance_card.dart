@@ -11,7 +11,7 @@ class AttendanceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasCheckedIn = todayRecord != null;
-    final hasCheckedOut = todayRecord?.chekOutime != null;
+    final hasCheckedOut = todayRecord?.checkOutTime != null;
 
     final (cardColor, iconColor, iconData, statusText) = _getCardStyle(hasCheckedIn, hasCheckedOut);
 
@@ -39,7 +39,7 @@ class AttendanceCard extends StatelessWidget {
             if (hasCheckedIn) ...[
               SizedBox(height: 20),
               _buildTimeDetails(iconColor),
-              if (todayRecord!.chekInPhotoPath != null || todayRecord!.chekOutPhotoPath != null)
+              if (todayRecord!.checkInPhotoPath != null || todayRecord!.checkOutPhotoPath != null)
               _buildPhotoRow(),
             ]
           ],
@@ -88,15 +88,15 @@ class AttendanceCard extends StatelessWidget {
           _TimeRow(
             icon: Icons.login_rounded,
             label: 'Check in',
-            value: DateFormat('hh:mm a').format(todayRecord!.chekInTime),
+            value: DateFormat('hh:mm a').format(todayRecord!.checkInTime),
             color: color,
           ),
-          if(todayRecord!.chekOutime !=null) ... [
+          if(todayRecord!.checkOutTime !=null) ... [
             SizedBox(height: 12),
             _TimeRow(
               icon: Icons.logout_rounded,
               label: 'Check out',
-              value: DateFormat('hh:mm a').format(todayRecord!.chekOutime!),
+              value: DateFormat('hh:mm a').format(todayRecord!.checkOutTime!),
               color: color,
             )
           ]
@@ -110,19 +110,19 @@ class AttendanceCard extends StatelessWidget {
       padding: EdgeInsetsGeometry.only(top: 16),
       child: Row(
         children: [
-          if (todayRecord!.chekInPhotoPath !=null)
+          if (todayRecord!.checkInPhotoPath !=null)
         Expanded(
           child: PhotoViewer(
-            photoKey: todayRecord!.chekInPhotoPath,
+            photoKey: todayRecord!.checkInPhotoPath,
             label: 'check-in',
           ),
         ),
-      if (todayRecord!.chekInPhotoPath != null && todayRecord!.chekOutPhotoPath !=null)
+      if (todayRecord!.checkInPhotoPath != null && todayRecord!.checkOutPhotoPath !=null)
         SizedBox(width: 8),
-         if (todayRecord!.chekInPhotoPath != null)
+         if (todayRecord!.checkInPhotoPath != null)
          Expanded(
           child: PhotoViewer(
-            photoKey: todayRecord!.chekOutPhotoPath,
+            photoKey: todayRecord!.checkOutPhotoPath,
             label: 'check-outw',
           ),
          )

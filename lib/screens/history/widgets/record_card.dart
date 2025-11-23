@@ -10,7 +10,7 @@ final AttendanceRecord record;
 
   @override
   Widget build(BuildContext context) {
-    final isComplete = record.chekOutime !=null;
+    final isComplete = record.checkOutTime !=null;
 
     return Card(
       margin: EdgeInsets.only(bottom: 12),
@@ -23,7 +23,7 @@ final AttendanceRecord record;
             Divider(height: 24),
 
             _buildTimeInfo(isComplete),
-            if (record.chekInPhotoPath !=null || record.chekOutPhotoPath !=null)
+            if (record.checkInPhotoPath !=null || record.checkOutPhotoPath !=null)
              _buildPhotos(),
              if (record.notes !=null && record.notes!.isEmpty)
               _buildNotes(),
@@ -69,7 +69,7 @@ final AttendanceRecord record;
           child: _InfoColum(
             icon: Icons.login,
             label: 'Check in',
-            value: DateFormat('hh:mm a').format(record.chekInTime),
+            value: DateFormat('hh:mm a').format(record.checkInTime),
           ) ,
         ),
         if(isComplete) ... [
@@ -77,15 +77,15 @@ final AttendanceRecord record;
             child: _InfoColum(
               icon: Icons.logout,
             label: 'check out',
-            value: DateFormat('hh:mm a').format(record.chekOutime!),
+            value: DateFormat('hh:mm a').format(record.checkOutTime!),
             ),
           ),
-          if(record.totalHour != null)
+          if(record.totalHours != null)
            Expanded(
             child: _InfoColum(
               icon: Icons.timer,
               label: 'total',
-              value: _formatDuration(record.totalHour!),
+              value: _formatDuration(record.totalHours!),
             ),
            )
         ]
@@ -98,19 +98,19 @@ final AttendanceRecord record;
       padding: EdgeInsets.only(top: 16),
       child: Row(
         children: [
-          if (record.chekInPhotoPath !=null)
+          if (record.checkInPhotoPath !=null)
             Expanded(
               child: PhotoViewer(
-                photoKey: record.chekInPhotoPath,
+                photoKey: record.checkInPhotoPath,
                 label: 'chek-in photo',
               ),
             ),
-          if(record.chekInPhotoPath !=null && record.chekOutPhotoPath !=null)
+          if(record.checkOutPhotoPath !=null && record.checkOutPhotoPath !=null)
             SizedBox(width: 8),
-             if (record.chekOutPhotoPath !=null)
+             if (record.checkOutPhotoPath !=null)
               Expanded(
                 child: PhotoViewer(
-                  photoKey: record.chekOutPhotoPath,
+                  photoKey: record.checkOutPhotoPath,
                   label: 'check-out photo',
                 ),
               )
